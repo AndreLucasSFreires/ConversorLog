@@ -25,9 +25,9 @@ namespace Aplicativo.Formatters
             }
             return transformLog;
         }
-        private static List<LogMinhaCDNDto> MapearLogsMinhaCdn(string[] linhas)
+        private static List<LogDadosDto> MapearLogsMinhaCdn(string[] linhas)
         {
-            List<LogMinhaCDNDto> logsMinhaCdn = new();
+            List<LogDadosDto> logsMinhaCdn = new();
             foreach (var linha in linhas)
             {
                 var conteudoLinha = linha.Split("|");

@@ -9,12 +9,14 @@ namespace InfraestruturaTests
     {
         Mock<ILogRepositorio> mockRepositorio = new Mock<ILogRepositorio>();
         private LogService logService;
-        private string logEntrada = "312|200|HIT|\"GET /robots.txt HTTP/1.1\"|100.2\n" +
+        private string logFormatoMinhaCdn = "312|200|HIT|\"GET /robots.txt HTTP/1.1\"|100.2\n" +
             "101|200|MISS|\"POST /myImages HTTP/1.1\"|319.4\n" +
             "199|404|MISS|\"GET /not-found HTTP/1.1\"|142.9\n" +
             "312|200|INVALIDATE|\"GET /robots.txt HTTP/1.1\"|245.1";
 
-        private string logTransformado = "\"MINHA CDN\" GET 200 /robots.txt 100 312 HIT\n" +
+        private string logFormatoAgora = "#Version: 1.0 #Date: 04/12/2024 14:13:22\n" +
+            "#Fields: provider http-method status-code uri-path time-taken response-size cache-status\n" +
+            "\"MINHA CDN\" GET 200 /robots.txt 100 312 HIT\n" +
             "\"MINHA CDN\" POST 200 /myImages 319 101 MISS\n" +
             "\"MINHA CDN\" GET 404 /not-found 143 199 MISS\n" +
             "\"MINHA CDN\" GET 200 /robots.txt 245 312 REFRESH_HIT";
@@ -25,9 +27,17 @@ namespace InfraestruturaTests
         }
 
         [Fact]
-        public void TransformarLogAsync_DeveTransformarLogCorretamente()
+        public void TransformarLogAsync_DeveTransformarLogFormatoAgoraEmMinhaCdn()
         {
-            var logAgora = logService.TransformarLogAsync(logEntrada);
+            var logMinhaCdn = logService.TransformarLogAsync(logFormatoAgora);
+            Assert.Contains("312|200|HIT|\"GET /robots.txt HTTP/1.1\"", logMinhaCdn);
+            Assert.Contains("312|200|INVALIDATE|\"GET /robots.txt HTTP/1.1\"|245", logMinhaCdn);
+        }
+
+        [Fact]
+        public void TransformarLogAsync_DeveTransformarLogMinhaCdnEmFormatoAgora()
+        {
+            var logAgora = logService.TransformarLogAsync(logFormatoMinhaCdn);
             Assert.Contains("#Version: 1.0", logAgora);
             Assert.Contains("\"MINHA CDN\" GET 200 /robots.txt 100 312 HIT", logAgora);
             Assert.Contains("\"MINHA CDN\" POST 200 /myImages 319 101 MISS", logAgora);
@@ -37,9 +47,9 @@ namespace InfraestruturaTests
         [Fact]
         public async Task SalvarLogAsync_DeveSalvarLogNoRepositorio()
         {
-            await logService.SalvarLogAsync(logEntrada,logTransformado);
+            await logService.SalvarLogAsync(logFormatoMinhaCdn,logFormatoAgora);
             mockRepositorio.Verify(repo => repo.SalvarAsync(It.Is<Log>(log =>
-            log.LogEntrada == logEntrada && log.LogTransformado == logTransformado
+            log.LogEntrada == logFormatoMinhaCdn && log.LogTransformado == logFormatoAgora
             && log.DataCriacao <= DateTime.UtcNow
             )),Times.Once);
         }
