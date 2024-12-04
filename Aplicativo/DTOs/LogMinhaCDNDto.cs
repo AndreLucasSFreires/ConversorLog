@@ -6,6 +6,17 @@ using System.Threading.Tasks;
 
 namespace Aplicativo.DTOs
 {
+
+    public class LogAgoraDto
+    {
+        public string CodigoInterno { get; set; }
+        public string StatusCache { get; set; }
+        public string ValorDecimal { get; set; }
+        public string RequisicaoArquivo { get; set; }
+        public string CodigoHttp { get; set; }
+        public string MetodoHttp { get; set; }
+    }
+
     public class LogMinhaCDNDto
     {
         private string _statusCache = string.Empty;

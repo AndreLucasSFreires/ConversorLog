@@ -39,7 +39,7 @@ namespace ConversorLog.Controllers
         {
             var logTransformado = _logService.TransformarLogAsync(logRequest.LogEntrada);
             await _logService.SalvarLogAsync(logRequest.LogEntrada, logTransformado);
-            return Ok(new {Mensagem = "Log Salvo com sucesso!", formatoAgora = logTransformado });
+            return Ok(new {Mensagem = "Log Salvo com sucesso!", transformado = logTransformado });
         }
 
         [HttpPost("Transformar")]
