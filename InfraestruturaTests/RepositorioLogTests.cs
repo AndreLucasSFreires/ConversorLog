@@ -19,7 +19,6 @@ namespace ConversorLogTests
 
             _contexto = new ConversorLogContexto(_options);
             _repositorioLog = new RepositorioLog(_contexto);
-                
         }
 
         [Fact]
